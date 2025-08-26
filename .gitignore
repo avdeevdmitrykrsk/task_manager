@@ -13,8 +13,9 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-*.db
+/src/*.db
 .eggs/
+.vscode/
 lib/
 lib64/
 parts/
