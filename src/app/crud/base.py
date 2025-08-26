@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import uuid
 from typing import Generic, List, Optional, TypeVar, Union
@@ -96,6 +97,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field, value in new_data.items():
             if hasattr(instance, field):
                 setattr(instance, field, value)
+
+        instance.updated_at = datetime.now()
 
         await session.commit()
         await session.refresh(instance)

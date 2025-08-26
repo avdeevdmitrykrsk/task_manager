@@ -6,7 +6,7 @@ from app.api.endpoints.websocket import (
     ConnectionManager,
     get_connection_manager,
 )
-from app.crud.base import CRUDBase, ModelType
+from app.crud.base import CRUDBase
 from app.models.task_manager import Task
 from app.schemas.task_manager import CreateTaskSchema, UpdateTaskSchema
 
@@ -17,7 +17,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         super().__init__(model)
         self.connection_manager = manager
 
-    async def _generate_br_data(self, instance: ModelType) -> dict:
+    async def _generate_br_data(self, instance: Task) -> dict:
         return {
             "data": {
                 "id": str(instance.id),
@@ -30,12 +30,12 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
 
     async def update(
         self,
-        instance: ModelType,
+        instance: Task,
         new_data: dict,
         session: AsyncSession,
-    ) -> ModelType:
+    ) -> Task:
 
-        updated_task: ModelType = await super().update(
+        updated_task: Task = await super().update(
             instance=instance, new_data=new_data, session=session
         )
 
@@ -49,7 +49,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         self,
         data: dict,
         session: AsyncSession,
-    ) -> ModelType:
+    ) -> Task:
 
         new_task = await super().create(data=data, session=session)
 
@@ -61,7 +61,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
 
     async def delete(
         self,
-        instance: ModelType,
+        instance: Task,
         session: AsyncSession,
     ) -> None:
         deleted_task = await super().delete(instance=instance, session=session)
