@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: d4192378e5e2
+Revision ID: 57736eb45a03
 Revises: 
-Create Date: 2025-08-24 22:01:35.156002
+Create Date: 2025-08-26 17:02:55.186933
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd4192378e5e2'
+revision = '57736eb45a03'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True, comment='Дата создания'),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True, comment='Дата обновления'),
     sa.Column('name', sa.String(length=256), nullable=False, comment='Название задачи'),
-    sa.Column('description', sa.Text(), nullable=True, comment='Подробное описание задачи'),
+    sa.Column('description', sa.Text(), nullable=False, comment='Описание задачи'),
     sa.Column('status', sa.String(length=20), server_default='Создано', nullable=False, comment='Статус выполнения задачи'),
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.CheckConstraint("status IN ('Создано', 'В работе', 'Завершено')", name='check_status'),
