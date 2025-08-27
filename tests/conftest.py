@@ -58,6 +58,13 @@ async def valid_task_data():
         'description': 'Тестовое описание'
     }
 
+@pytest_asyncio.fixture
+async def valid_task_data2():
+    return {
+        'name': 'Тестовая задача2',
+        'description': 'Тестовое описание2'
+    }
+
 
 @pytest_asyncio.fixture
 async def new_valid_task_data():

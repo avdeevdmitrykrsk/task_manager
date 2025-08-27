@@ -36,6 +36,30 @@ async def test_get_task(
 
 
 @pytest.mark.asyncio
+async def test_get_task_list(
+    session: AsyncSession,
+    task_crud: TaskCRUD,
+    valid_task_data: dict,
+    valid_task_data2: dict,
+):
+    task1_data = CreateTaskSchema(**valid_task_data)
+    task2_data = CreateTaskSchema(**valid_task_data2)
+
+    task1 = await task_crud.create(
+        data=task1_data.model_dump(), session=session
+    )
+    task2 = await task_crud.create(
+        data=task2_data.model_dump(), session=session
+    )
+
+    tasks = await task_crud.get_list(session)
+
+    assert len(tasks) == 2
+    assert {task.id for task in tasks} == {task1.id, task2.id}
+    assert {task.name for task in tasks} == {task1.name, task2.name}
+
+
+@pytest.mark.asyncio
 async def test_patch_task(
     session: AsyncSession,
     task_crud: TaskCRUD,

@@ -13,7 +13,6 @@ from app.schemas.task_manager import (
     CreateTaskSchema,
     GetTaskSchema,
     TaskFilter,
-    # TaskFilterSchema,
     UpdateTaskSchema,
     validate_filters,
 )
