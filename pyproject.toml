@@ -7,6 +7,3 @@ force_grid_wrap = 0
 use_parentheses = true
 known_first_party = ["src", "app", "main", "core", "models", "schemas", "crud", "api", "endpoints", "services", "utils", "tests"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-
-[tool.pytest.ini_options]
-pythonpath = "src"

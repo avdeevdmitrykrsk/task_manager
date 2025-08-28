@@ -2,17 +2,16 @@ import logging
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query, Response, status
-from fastapi_filter import FilterDepends
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.crud.task_manager import TaskCRUD, get_task_crud
 from app.models.task_manager import Task
+from app.schemas.filters import TaskFilter
 from app.schemas.task_manager import (
     CreateTaskSchema,
     GetTaskSchema,
-    TaskFilter,
     UpdateTaskSchema,
     validate_filters,
 )
@@ -65,11 +64,7 @@ async def create_task(
     task_crud: TaskCRUD = Depends(get_task_crud),
     session: AsyncSession = Depends(get_async_session),
 ) -> GetTaskSchema:
-
-    data = task_data.model_dump()
-    await task_crud.check_unique_name(session=session, name=data['name'])
-
-    return await task_crud.create(session=session, data=data)
+    return await task_crud.create(session=session, data=task_data.model_dump())
 
 
 @router.patch(
@@ -86,12 +81,8 @@ async def update_task(
 ) -> Task:
 
     instance = await task_crud.get_or_404(session=session, pk=task_id)
-    validated_data = await task_crud.validate_before_update(
-        session, new_task_data.model_dump(exclude_unset=True)
-    )
-
     return await task_crud.update(
-        session=session, instance=instance, new_data=validated_data
+        session=session, instance=instance, new_data=new_task_data
     )
 
 

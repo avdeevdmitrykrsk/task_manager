@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,8 +37,15 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         session: AsyncSession,
     ) -> Task:
 
+        if 'name' in new_data:
+            await self.check_unique_name(
+                session, name=new_data['name'], exclude_id=instance.id
+            )
+
         updated_task: Task = await super().update(
-            instance=instance, new_data=new_data, session=session
+            instance=instance,
+            new_data=new_data,
+            session=session,
         )
 
         br_data = await self._generate_br_data(updated_task)
@@ -50,6 +59,8 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         data: dict,
         session: AsyncSession,
     ) -> Task:
+
+        await self.check_unique_name(session, name=data['name'])
 
         new_task = await super().create(data=data, session=session)
 
@@ -71,28 +82,27 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         await self.connection_manager.broadcast(br_data)
 
     async def check_unique_name(
-        self, session: AsyncSession, name: str
+        self,
+        session: AsyncSession,
+        name: str,
+        exclude_id: Optional[str] = None,
     ) -> None:
 
-        result = await session.execute(
-            select(self.model).where(
-                func.lower(self.model.name) == name.lower()
-            )
+        query = select(self.model).where(
+            func.lower(self.model.name) == func.lower(name)
         )
-        db_obj = result.scalars().all()
+
+        if exclude_id is not None:
+            query = query.where(self.model.id != exclude_id)
+
+        result = await session.execute(query)
+        db_obj = result.scalars().first()
 
         if db_obj:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f'Имя \'{name}\' недоступно.',
             )
-
-    async def validate_before_update(
-        self, session: AsyncSession, data: dict
-    ) -> dict:
-        if 'name' in data:
-            await self.check_unique_name(session=session, name=data['name'])
-        return data
 
 
 def get_task_crud(

@@ -1,20 +1,12 @@
 # Standart lib imports
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Optional
 
 # Thirdparty imports
 from fastapi import HTTPException, Query, Request
 from fastapi import status as http_status
-from fastapi_filter.contrib.sqlalchemy import Filter
-from pydantic import (
-    UUID4,
-    BaseModel,
-    ConfigDict,
-    Field,
-    ValidationError,
-    field_validator,
-)
+from pydantic import UUID4, BaseModel, ConfigDict, Field, field_validator
 
 from app.core.constants import (
     MAX_TASK_DESCR_LENGTH,
@@ -22,7 +14,7 @@ from app.core.constants import (
     MIN_TASK_DESCR_LENGTH,
     MIN_TASK_NAME_LENGTH,
 )
-from app.models.task_manager import Task
+from app.schemas.filters import TaskFilter, TaskStatus
 
 TASK_STATUSES = ('создано', 'в работе', 'завершено')
 
@@ -70,25 +62,6 @@ class UpdateTaskSchema(BaseModel):
                 f'выберите из: {" -- ".join(valid_statuses)}'
             )
         return value
-
-
-class TaskStatus(str, Enum):
-
-    CREATED = 'Создано'
-    IN_PROGRESS = 'В работе'
-    COMPLETED = 'Завершено'
-
-
-class TaskFilter(Filter):
-
-    status: Optional[TaskStatus] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
-
-    class Constants:
-        model = Task
-        ordering_field_name = 'created_at'
-        search_field_name = 'some_name'
 
 
 async def validate_filters(

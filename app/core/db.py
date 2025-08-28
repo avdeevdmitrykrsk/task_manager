@@ -3,11 +3,7 @@ from uuid import uuid4
 from sqlalchemy import Column, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import (
-    declarative_base,
-    declared_attr,
-    sessionmaker,
-)
+from sqlalchemy.orm import declarative_base, declared_attr, sessionmaker
 
 from app.core.config import settings
 
@@ -41,6 +37,7 @@ class PreBase:
             unique=True,
             nullable=False,
         )
+
     created_at = Column(
         DateTime, server_default=func.now(), comment='Дата создания'
     )

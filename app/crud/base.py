@@ -38,8 +38,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[Optional[ModelType]]:
         """Получает все записи по фильтру из БД"""
 
-        logger.info('Применение фильтров списка.')
-        query = filters.filter(select(self.model))
+        query = select(self.model)
+        if filters:
+            logger.info('Применение фильтров списка.')
+            query = filters.filter(query)
 
         logger.info('Выполняется получение списка.')
         result = await session.execute(query)
