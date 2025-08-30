@@ -4,6 +4,7 @@ services:
   db:
     image: postgres:13-alpine
     env_file: .env
+    container_name: test_db
     environment:
       POSTGRES_DB: ${POSTGRES_TEST_DB}
       POSTGRES_USER: ${POSTGRES_TEST_USER}

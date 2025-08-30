@@ -26,11 +26,13 @@ class Settings(BaseSettings):
     )
 
     # postgres
-    pg_db: Optional[str] = Field(default=None, description='Название БД')
-    pg_user: Optional[str] = Field(default=None, description='Пользователь БД')
-    pg_password: Optional[str] = Field(default=None, description='Пароль БД')
-    db_host: str = Field(default='localhost', description='Хост БД')
-    db_port: str = Field(default='5432', description='Порт БД')
+    pg_db: Optional[str] = Field(default='test_db', description='Название БД')
+    pg_user: Optional[str] = Field(
+        default='user', description='Пользователь БД'
+    )
+    pg_password: Optional[str] = Field(
+        default='password', description='Пароль БД'
+    )
 
     # pytest
     postgres_test_user: Optional[str] = Field(
@@ -48,56 +50,43 @@ class Settings(BaseSettings):
         env_file_encoding='utf-8',
         env_prefix='',
         case_sensitive=False,
+        extra='ignore',
     )
 
     @property
-    def postgres_user(self) -> str:
-        data = {
-            'local': None,
-            'docker': self.postgres_test_user,
-            False: self.pg_user,
-        }
+    def db_host(self) -> str:
+        return 'db' if self.debug_mode == 'False' else 'localhost'
 
-        return data.get(self.debug_mode, False)
+    @property
+    def db_port(self) -> int:
+        return '5433' if self.debug_mode == 'docker' else '5432'
+
+    @property
+    def postgres_user(self) -> str:
+        return (
+            self.pg_user
+            if self.debug_mode == 'False'
+            else self.postgres_test_user
+        )
 
     @property
     def postgres_password(self) -> str:
-        data = {
-            'local': None,
-            'docker': self.postgres_test_password,
-            False: self.pg_password,
-        }
-
-        return data.get(self.debug_mode, False)
+        return (
+            self.pg_password
+            if self.debug_mode == 'False'
+            else self.postgres_test_password
+        )
 
     @property
     def postgres_db(self) -> str:
-        data = {
-            'local': None,
-            'docker': self.postgres_test_db,
-            False: self.pg_db,
-        }
-
-        return data.get(self.debug_mode, False)
+        return (
+            self.pg_db if self.debug_mode == 'False' else self.postgres_test_db
+        )
 
     @property
     def database_url(self) -> str:
-        """Строка подключения к postgres/sqlite DB."""
-
         if self.debug_mode == 'local':
             return 'sqlite+aiosqlite:///test.db'
-
-        if not all(
-            [
-                self.postgres_user,
-                self.postgres_password,
-                self.postgres_db,
-                self.db_host,
-                self.db_port,
-            ]
-        ):
-            raise ValueError('Отсутствуют обязательные настройки PostgreSQL')
-
         return (
             f'postgresql+asyncpg://'
             f'{self.postgres_user}:{self.postgres_password}'

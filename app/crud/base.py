@@ -5,8 +5,6 @@ from typing import Generic, List, Optional, TypeVar, Union
 
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from fastapi_pagination import Page, Params
-from fastapi_pagination.ext.async_sqlalchemy import paginate
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

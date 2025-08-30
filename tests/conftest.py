@@ -14,20 +14,20 @@ from .fixtures import *  # noqa
 load_dotenv()
 
 
-def get_databse_url():
-    return (
-        f'postgresql+asyncpg://'
-        f'{settings.postgres_user}:{settings.postgres_password}'
-        f'@localhost:{settings.db_port}/{settings.postgres_db}'
-        if settings.debug_mode == 'docker'
-        else 'sqlite+aiosqlite:///./pytest.db'
-    )
+# def get_databse_url():
+#     return (
+#         f'postgresql+asyncpg://'
+#         f'{settings.postgres_user}:{settings.postgres_password}'
+#         f'@localhost:{settings.db_port}/{settings.postgres_db}'
+#         if settings.debug_mode == 'docker'
+#         else 'sqlite+aiosqlite:///./pytest.db'
+#     )
 
 
 @pytest.fixture(scope='session', autouse=True)
 def engine():
     engine = create_async_engine(
-        get_databse_url(),
+        settings.database_url,
         echo=False,
         poolclass=NullPool,
     )
