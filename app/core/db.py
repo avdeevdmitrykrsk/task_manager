@@ -18,7 +18,7 @@ class PreBase:
 
     @declared_attr
     def id(cls):
-        if settings.debug_mode:
+        if settings.debug_mode == 'local':
             #  Для sqlite.
             return Column(
                 String(36),

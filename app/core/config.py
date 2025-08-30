@@ -3,7 +3,7 @@ import logging
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 # Thirdparty imports
 from dotenv import load_dotenv
@@ -18,21 +18,30 @@ LOG_DIR.mkdir(exist_ok=True)
 
 class Settings(BaseSettings):
     # project
-    debug_mode: bool = Field(default=False, description='Режим отладки')
+    debug_mode: Union[bool, str] = Field(
+        default=True, description='Режим отладки'
+    )
     secret_key: Optional[str] = Field(
         default=None, description='Секретный ключ приложения'
     )
 
     # postgres
-    postgres_db: Optional[str] = Field(default=None, description='Название БД')
-    postgres_user: Optional[str] = Field(
-        default=None, description='Пользователь БД'
-    )
-    postgres_password: Optional[str] = Field(
-        default=None, description='Пароль БД'
-    )
+    pg_db: Optional[str] = Field(default=None, description='Название БД')
+    pg_user: Optional[str] = Field(default=None, description='Пользователь БД')
+    pg_password: Optional[str] = Field(default=None, description='Пароль БД')
     db_host: str = Field(default='localhost', description='Хост БД')
     db_port: str = Field(default='5432', description='Порт БД')
+
+    # pytest
+    postgres_test_user: Optional[str] = Field(
+        default=None, description='Тест-пользователь в БД'
+    )
+    postgres_test_password: Optional[str] = Field(
+        default=None, description='Тест-пароль в БД'
+    )
+    postgres_test_db: Optional[str] = Field(
+        default=None, description='Название тестовой БД'
+    )
 
     model_config = ConfigDict(
         env_file='.env',
@@ -42,10 +51,40 @@ class Settings(BaseSettings):
     )
 
     @property
+    def postgres_user(self) -> str:
+        data = {
+            'local': None,
+            'docker': self.postgres_test_user,
+            False: self.pg_user,
+        }
+
+        return data.get(self.debug_mode, False)
+
+    @property
+    def postgres_password(self) -> str:
+        data = {
+            'local': None,
+            'docker': self.postgres_test_password,
+            False: self.pg_password,
+        }
+
+        return data.get(self.debug_mode, False)
+
+    @property
+    def postgres_db(self) -> str:
+        data = {
+            'local': None,
+            'docker': self.postgres_test_db,
+            False: self.pg_db,
+        }
+
+        return data.get(self.debug_mode, False)
+
+    @property
     def database_url(self) -> str:
         """Строка подключения к postgres/sqlite DB."""
 
-        if self.debug_mode:
+        if self.debug_mode == 'local':
             return 'sqlite+aiosqlite:///test.db'
 
         if not all(
@@ -57,7 +96,7 @@ class Settings(BaseSettings):
                 self.db_port,
             ]
         ):
-            raise ValueError("Отсутствуют обязательные настройки PostgreSQL")
+            raise ValueError('Отсутствуют обязательные настройки PostgreSQL')
 
         return (
             f'postgresql+asyncpg://'

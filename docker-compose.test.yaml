@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_TEST_DB}
+      POSTGRES_USER: ${POSTGRES_TEST_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
+    ports:
+      - "5433:5432"
+

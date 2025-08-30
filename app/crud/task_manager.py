@@ -19,14 +19,22 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         super().__init__(model)
         self.connection_manager = manager
 
+    def is_valid_status_transition(self, old: str, new: str) -> bool:
+        transitions = {
+            'Создано': ['В работе'],
+            'В работе': ['Завершено'],
+            'Завершено': ['В работе'],
+        }
+        return new in transitions.get(old)
+
     async def _generate_br_data(self, instance: Task) -> dict:
         return {
-            "data": {
-                "id": str(instance.id),
-                "name": instance.name,
-                "status": instance.status,
-                "description": instance.description,
-                "updated_at": instance.updated_at.isoformat(),
+            'data': {
+                'id': str(instance.id),
+                'name': instance.name,
+                'status': instance.status,
+                'description': instance.description,
+                'updated_at': instance.updated_at.isoformat(),
             },
         }
 
@@ -42,6 +50,17 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
                 session, name=new_data['name'], exclude_id=instance.id
             )
 
+        if 'status' in new_data:
+            old_status = instance.status
+            new_status = new_data['status']
+
+            if not self.is_valid_status_transition(old_status, new_status):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f'Недопустимый переход статуса: '
+                    f'{old_status} -> {new_status}',
+                )
+
         updated_task: Task = await super().update(
             instance=instance,
             new_data=new_data,
@@ -49,7 +68,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         )
 
         br_data = await self._generate_br_data(updated_task)
-        br_data['event'] = "task_updated"
+        br_data['event'] = 'task_updated'
         await self.connection_manager.broadcast(br_data)
 
         return updated_task

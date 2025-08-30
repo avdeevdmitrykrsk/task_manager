@@ -23,14 +23,14 @@ services:
       timeout: 5s
       retries: 5
   app:
-    build: ./src
+    build: .
     env_file: .env
     environment:
       - PYTHONPATH=/app
     depends_on:
       - db
     volumes:
-      - ./src/app:/app/app
+      - ./app:/app/app
   gateway:
     build: ./nginx
     env_file: .env

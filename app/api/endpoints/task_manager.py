@@ -82,7 +82,11 @@ async def update_task(
 
     instance = await task_crud.get_or_404(session=session, pk=task_id)
     return await task_crud.update(
-        session=session, instance=instance, new_data=new_task_data
+        session=session,
+        instance=instance,
+        new_data=new_task_data.model_dump(
+            exclude_unset=True, exclude_none=True
+        ),
     )
 
 

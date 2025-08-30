@@ -56,7 +56,7 @@ async def test_get_task(
 
 
 @pytest.mark.asyncio
-async def test_get_task_list(
+async def test_get_tasks_list(
     session: AsyncSession, task_crud: TaskCRUD, create_task
 ):
 
@@ -70,7 +70,7 @@ async def test_get_task_list(
 
 
 @pytest.mark.asyncio
-async def test_get_task_filtered_list(
+async def test_get_tasks_filtered_list(
     session: AsyncSession,
     task_crud: TaskCRUD,
     create_task,
@@ -91,7 +91,7 @@ async def test_get_task_filtered_list(
 
 
 @pytest.mark.asyncio
-async def test_patch_task(
+async def test_update_task(
     session: AsyncSession,
     task_crud: TaskCRUD,
     new_valid_task_data: dict,
@@ -109,6 +109,7 @@ async def test_patch_task(
 
     assert updated_task.name == new_valid_task_data['name']
     assert updated_task.description == new_valid_task_data['description']
+    assert updated_task.status == new_valid_task_data['status']
 
 
 @pytest.mark.asyncio
