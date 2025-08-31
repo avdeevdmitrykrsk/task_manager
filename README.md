@@ -128,6 +128,25 @@ docker-compose -p task_manager_prod up --build
     "updated_at": "2025-08-30T10:00:00"
   }
 ```
+## Websocket
+### Connect `ws://<host>/api/tasks/ws`
+### `event types:`
+```python
+"task_created", "task_updated", "task_deleted"
+```
+```json
+{
+    "event": "task_updated",
+    "data": {
+        "id": "735adbe8-063b-44e6-9e45-bdc0b010fb01",
+        "name": "Новая задача",
+        "description": "Описание задачи",
+        "status": "В работе",
+        "created_at": "2025-08-30T09:00:00",
+        "updated_at": "2025-08-30T10:00:00"
+    },
+}
+```
 
 ## Тесты
 ### Все тесты запускаются из корневой директории командой `pytest`, предварительно не забыв сделать миграции и выставить необходимый режим, тесты работают с режимами `debug_mode=local` и `debug_mode=docker`
