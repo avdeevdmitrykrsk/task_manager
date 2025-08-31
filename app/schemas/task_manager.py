@@ -3,8 +3,6 @@ from datetime import datetime
 from typing import Optional
 
 # Thirdparty imports
-from fastapi import HTTPException, Query, Request
-from fastapi import status as http_status
 from pydantic import UUID4, BaseModel, ConfigDict, Field, field_validator
 
 from app.core.constants import (
@@ -13,7 +11,6 @@ from app.core.constants import (
     MIN_TASK_DESCR_LENGTH,
     MIN_TASK_NAME_LENGTH,
 )
-from app.schemas.filters import TaskFilter, TaskStatus
 
 TASK_STATUSES = ('создано', 'в работе', 'завершено')
 
@@ -61,30 +58,3 @@ class UpdateTaskSchema(BaseModel):
                 f'выберите из: {" -- ".join(valid_statuses)}'
             )
         return value
-
-
-async def validate_filters(
-    request: Request,
-    status: Optional[TaskStatus] = Query(None),
-    name: Optional[str] = Query(None),
-    description: Optional[str] = Query(None),
-) -> TaskFilter:
-    allowed_params = {
-        'status',
-        'name',
-        'description',
-    }
-    query_params = set(request.query_params.keys())
-
-    extra_params = query_params - allowed_params
-    if extra_params:
-        raise HTTPException(
-            status_code=http_status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f'Недопустимые параметры: {extra_params}',
-        )
-
-    return TaskFilter(
-        status=status,
-        name=name,
-        description=description,
-    )

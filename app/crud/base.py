@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.db import Base
-from app.schemas.task_manager import TaskFilter
+from app.schemas.filters import TaskFilter
 
 logger = logging.getLogger(__name__)
 

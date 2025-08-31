@@ -8,12 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.crud.task_manager import TaskCRUD, get_task_crud
 from app.models.task_manager import Task
-from app.schemas.filters import TaskFilter
+from app.schemas.filters import TaskFilter, validate_filters
 from app.schemas.task_manager import (
     CreateTaskSchema,
     GetTaskSchema,
     UpdateTaskSchema,
-    validate_filters,
 )
 
 router = APIRouter(prefix='/tasks')
