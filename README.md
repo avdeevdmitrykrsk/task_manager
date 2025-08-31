@@ -44,6 +44,8 @@ pip install -r requirements
 ## Запуск проекта
 ### Запуск для разработки локально на `sqlite`
 * Устанавливаем `debug_mode=local`
+* Создаем миграции `alembic`
+* Применяем миграции
 * Запускаем uvicorn
 ```bash
 uvicorn app.main:app --reload
@@ -54,7 +56,7 @@ uvicorn app.main:app --reload
 * Устанавливаем `debug_mode=docker`
 * Создаем миграции `alembic`
 * Применяем миграции
-* Запускаем контейнер через тестовый `docker-compose`, контейнер запустится на порту `5433`
+* Запускаем контейнер через тестовый `docker-compose`, контейнер запустится на порту `5433`, обязательно указываем `--project-name` иначе будут конфликты тестовой и прод БД.
 ```bash
 docker-compose -f docker-compose.test.yml -p task_manager_test up --build
 ```
