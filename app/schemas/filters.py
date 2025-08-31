@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Optional
 
 from fastapi_filter.contrib.sqlalchemy import Filter
+
 from app.models.task_manager import Task
 
 

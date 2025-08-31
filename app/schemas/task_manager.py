@@ -1,6 +1,5 @@
 # Standart lib imports
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
 # Thirdparty imports

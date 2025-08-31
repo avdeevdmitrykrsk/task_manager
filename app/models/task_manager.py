@@ -1,9 +1,5 @@
-from uuid import UUID
-from sqlalchemy import CheckConstraint, Column, ForeignKey, String, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import CheckConstraint, Column, String, Text
 
-from app.core.config import settings
 from app.core.constants import MAX_TASK_NAME_LENGTH, MAX_TASK_STATUS_LENGTH
 from app.core.db import Base
 
@@ -16,9 +12,7 @@ class Task(Base):
         nullable=False,
         comment='Название задачи',
     )
-    description = Column(
-        Text(), nullable=False, comment='Описание задачи'
-    )
+    description = Column(Text(), nullable=False, comment='Описание задачи')
     status = Column(
         String(MAX_TASK_STATUS_LENGTH),
         index=True,

@@ -84,7 +84,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         new_task = await super().create(data=data, session=session)
 
         br_data = await self._generate_br_data(new_task)
-        br_data['event'] = "task_created"
+        br_data['event'] = 'task_created'
         await self.connection_manager.broadcast(br_data)
 
         return new_task
@@ -97,7 +97,7 @@ class TaskCRUD(CRUDBase[Task, CreateTaskSchema, UpdateTaskSchema]):
         deleted_task = await super().delete(instance=instance, session=session)
 
         br_data = await self._generate_br_data(deleted_task)
-        br_data['event'] = "task_deleted"
+        br_data['event'] = 'task_deleted'
         await self.connection_manager.broadcast(br_data)
 
     async def check_unique_name(

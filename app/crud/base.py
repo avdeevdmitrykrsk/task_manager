@@ -1,14 +1,12 @@
-from datetime import datetime
 import logging
 import uuid
+from datetime import datetime
 from typing import Generic, List, Optional, TypeVar, Union
 
 from fastapi import HTTPException, status
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.selectable import Select
 
 from app.core.config import settings
 from app.core.db import Base
@@ -27,7 +25,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model: ModelType = model
 
     async def set_id_type(self, pk: Union[uuid.UUID, str]):
-        """Устанавливает тип для id в зависимости от debug_mode"""
+        """Устанавливает тип для id в зависимости от используемой db"""
 
         return str(pk) if settings.debug_mode else pk
 
@@ -66,7 +64,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f'Объект с id=\'{pk}\' не найден',
+                detail=f'Объект с id "{pk}" не найден',
             )
 
         logger.info(f'Объект с id "{pk}" получен и возвращен клиенту.')
@@ -108,7 +106,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self,
         instance: ModelType,
         session: AsyncSession,
-    ) -> None:
+    ) -> ModelType:
         """Удаляет запись из БД"""
 
         await session.delete(instance)
